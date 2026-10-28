@@ -1,0 +1,24 @@
+# Base44 development environment for this repo.
+#
+# The project is a single static page (index.html) whose libraries load from CDNs,
+# so there is nothing to build. nginx serves the file straight from the checkout,
+# which means edits to index.html appear on reload without any rebuild.
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      # Only the page is exposed: mounting the repo root would publish .git/ over HTTP.
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/index.html | grep -q 'CHRONOVA' || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: on-failure
+    labels:
+      base44.project: "CHRONOVA"
+      base44.kind: "web"
+      base44.port: "3000"
