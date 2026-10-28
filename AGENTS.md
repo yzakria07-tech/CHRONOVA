@@ -6,8 +6,10 @@ loaded from CDNs at runtime. No package manager, no build step, no backend,
 no database, no environment variables or secrets.
 
 The page's hero/lifestyle video is streamed from an external URL
-(`www.designarena.ai`), so that media needs outbound internet access; everything
-else ships in the HTML.
+(`www.designarena.ai`, which redirects to a Supabase signed URL). That host sends
+no `Access-Control-Allow-Origin`, so the `<video>` tags must NOT carry
+`crossorigin` — with it the media load fails outright and the hero goes blank.
+The page never reads video pixels (no canvas/WebGL), so CORS mode is unnecessary.
 
 ## Running it locally (Base44 sandbox)
 `docker-compose.base44.yml` runs `nginx:alpine` on host port 3000 with
